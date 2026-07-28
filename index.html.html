@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHYSICS QUEST: ESCAPE THE LAB</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Dynamic Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- App Container -->
+    <div id="app">
+        <!-- Top Navigation & Stats Bar -->
+        <header class="game-header">
+            <div class="logo">
+                <span class="highlight">PHYSICS</span>QUEST
+            </div>
+            <div class="stats-container" id="stats-bar" style="display: none;">
+                <div class="stat-box">
+                    <span class="label">PHE BÌNH/MẠNG:</span>
+                    <div id="lives" class="hearts">❤️❤️❤️</div>
+                </div>
+                <div class="stat-box">
+                    <span class="label">ĐIỂM:</span>
+                    <span id="score" class="value">0000</span>
+                </div>
+                <div class="stat-box">
+                    <span class="label">THỜI GIAN:</span>
+                    <span id="timer" class="value">00:00</span>
+                </div>
+            </div>
+            <div class="controls">
+                <button id="btn-sound" class="icon-btn" title="Âm thanh">🔊</button>
+                <button id="btn-reset" class="icon-btn" title="Thử lại" style="display: none;">🔄</button>
+            </div>
+        </header>
+
+        <!-- Main Screen Router Container -->
+        <main id="main-view" class="glass-panel">
+
+            <!-- 1. LOADING SCREEN -->
+            <section id="screen-loading" class="screen active">
+                <div class="loader-content">
+                    <h1 class="glow-title">PHYSICS QUEST</h1>
+                    <p class="subtitle">ESCAPE THE LAB</p>
+                    <div class="progress-bar-container">
+                        <div id="loading-progress" class="progress-bar"></div>
+                    </div>
+                    <p id="loading-text" class="status-text">Đang khởi tạo hệ thống an ninh phòng thí nghiệm...</p>
+                </div>
+            </section>
+
+            <!-- 2. MAIN MENU -->
+            <section id="screen-menu" class="screen">
+                <div class="menu-content">
+                    <h1 class="glow-title">PHYSICS QUEST</h1>
+                    <div class="tagline">ESCAPE THE LABORATORY</div>
+                    
+                    <div class="menu-buttons">
+                        <button class="btn btn-primary" onclick="Game.startNewGame()">🚀 BẮT ĐẦU VÀO PHÒNG</button>
+                        <button class="btn" onclick="UI.showModal('modal-instructions')">📖 HƯỚNG DẪN</button>
+                        <button class="btn" onclick="UI.showModal('modal-about')">ℹ️ GIỚI THIỆU</button>
+                        <button class="btn" onclick="UI.showModal('modal-achievements')">🏆 THÀNH TÍCH</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. GAMEPLAY SCREEN -->
+            <section id="screen-game" class="screen">
+                <div class="room-header">
+                    <div class="room-title-group">
+                        <span id="room-badge" class="badge">PHÒNG 01/05</span>
+                        <h2 id="room-name">LỰC VÀ CHUYỂN ĐỘNG</h2>
+                    </div>
+                    <div class="progress-track">
+                        <div id="level-progress" class="level-progress-fill"></div>
+                    </div>
+                </div>
+
+                <div id="room-canvas-container" class="room-canvas">
+                    <!-- Dynamic Room Interactive Sandbox Inserted via JS -->
+                </div>
+
+                <div class="room-footer">
+                    <button id="btn-hint" class="btn btn-secondary" onclick="Game.requestHint()">💡 GỢI Ý (-5 ĐIỂM)</button>
+                    <button id="btn-action" class="btn btn-action" onclick="Game.checkCurrentRoom()">🔓 KÍCH HOẠT CỬA</button>
+                </div>
+            </section>
+
+            <!-- 4. ENDING SCREEN -->
+            <section id="screen-ending" class="screen">
+                <div class="ending-card glass-panel">
+                    <div id="ending-icon">🎉</div>
+                    <h1 id="ending-title" class="glow-title">XUẤT SẮC THOÁT KHỎI PHÒNG THÍ NGHIỆM!</h1>
+                    <p id="ending-desc">Bạn đã đánh bại AI phản diện và làm chủ các định luật Vật lý!</p>
+                    
+                    <div class="certificate glass-panel">
+                        <h3>CHỨNG NHẬN HOÀN THÀNH</h3>
+                        <p class="cert-name">NHÀ VẬT LÝ TRẺ XUẤT SẮC</p>
+                        <div class="cert-stats">
+                            <div>Tổng điểm: <strong id="cert-score">0</strong></div>
+                            <div>Thời gian: <strong id="cert-time">00:00</strong></div>
+                            <div>Hạng: <strong id="cert-rank">S CLASS</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="ending-actions">
+                        <button class="btn btn-primary" onclick="Game.restart()">🔄 CHƠI LẠI</button>
+                        <button class="btn" onclick="UI.switchScreen('screen-menu')">🏠 MENU CHÍNH</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- AI Assistant Robot (PIXY) -->
+        <aside id="pixy-container" class="pixy-wrapper">
+            <div id="pixy-dialog" class="pixy-bubble glass-panel">
+                <div id="pixy-text">Xin chào! Tớ là PIXY. Hãy để tớ giúp bạn thoát khỏi đây!</div>
+            </div>
+            <div class="pixy-avatar" onclick="PIXY.speak('Tớ sẵn sàng hỗ trợ bạn bất cứ lúc nào!')">
+                <div class="pixy-eye left"></div>
+                <div class="pixy-eye right"></div>
+                <div class="pixy-antenna"></div>
+            </div>
+        </aside>
+
+        <!-- MODALS -->
+        <!-- Instructions Modal -->
+        <div id="modal-instructions" class="modal">
+            <div class="modal-content glass-panel">
+                <h2>📖 HƯỚNG DẪN TRÒ CHƠI</h2>
+                <div class="modal-body">
+                    <p>Cốt truyện: AI phản diện A.X.O.N đã phong tỏa phòng thí nghiệm. Bạn phải dùng kiến thức Vật lý THCS để giải mã 5 căn phòng nhằm kích hoạt hệ thống thoát hiểm khẩn cấp.</p>
+                    <ul>
+                        <li><strong>Phòng 1:</strong> Xác định đúng hướng lực kéo/đẩy để xe di chuyển.</li>
+                        <li><strong>Phòng 2:</strong> Tính toán vận tốc phù hợp với quãng đường và thời gian cho trước.</li>
+                        <li><strong>Phòng 3:</strong> Kéo thả linh kiện nối mạch điện kín để thắp sáng bóng đèn.</li>
+                        <li><strong>Phòng 4:</strong> Xoay gương phẳng điều chỉnh tia Laser trúng vào cảm biến.</li>
+                        <li><strong>Phòng 5:</strong> Sắp xếp chuỗi chuyển hóa năng lượng chính xác.</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="UI.closeModal('modal-instructions')">ĐÃ RÕ</button>
+            </div>
+        </div>
+
+        <!-- About Modal -->
+        <div id="modal-about" class="modal">
+            <div class="modal-content glass-panel">
+                <h2>ℹ️ GIỚI THIỆU</h2>
+                <div class="modal-body">
+                    <p><strong>Physics Quest: Escape The Lab</strong> là trò chơi giáo dục Vật lý dành cho học sinh THCS (Lớp 8-9).</p>
+                    <p>Ứng dụng công nghệ thiết kế Game-Based Learning hiện đại, giúp biến các khái niệm Vật lý khô khan thành trải nghiệm nhập vai tương tác trực quan.</p>
+                </div>
+                <button class="btn" onclick="UI.closeModal('modal-about')">ĐÓNG</button>
+            </div>
+        </div>
+
+        <!-- Achievements Modal -->
+        <div id="modal-achievements" class="modal">
+            <div class="modal-content glass-panel">
+                <h2>🏆 THÀNH TÍCH (ACHIEVEMENTS)</h2>
+                <div class="modal-body" id="achievements-list">
+                    <!-- Dynamic Badges -->
+                </div>
+                <button class="btn" onclick="UI.closeModal('modal-achievements')">ĐÓNG</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fireworks Canvas for Ending -->
+    <canvas id="fireworks-canvas"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>

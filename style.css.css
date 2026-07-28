@@ -1,0 +1,722 @@
+/* ==========================================
+   RESET & GLOBAL VARIABLES (Sci-Fi Glass Theme)
+   ========================================== */
+:root {
+    --bg-dark: #080d1a;
+    --neon-blue: #00f3ff;
+    --neon-green: #00ff66;
+    --neon-pink: #ff0055;
+    --neon-yellow: #ffcc00;
+    --glass-bg: rgba(16, 26, 50, 0.65);
+    --glass-border: rgba(0, 243, 255, 0.25);
+    --text-color: #e0f7fc;
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    font-size: 18px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Background Dynamic Canvas */
+#bg-canvas, #fireworks-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Layout App Container */
+#app {
+    position: relative;
+    z-index: 10;
+    width: 95vw;
+    max-width: 1100px;
+    height: 90vh;
+    max-height: 750px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Glassmorphism Panel Component */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+/* ==========================================
+   HEADER & STATS BAR
+   ========================================== */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    height: 60px;
+    background: var(--glass-bg);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: #fff;
+    letter-spacing: 2px;
+}
+
+.logo .highlight {
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px var(--neon-blue);
+}
+
+.stats-container {
+    display: flex;
+    gap: 25px;
+}
+
+.stat-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+}
+
+.stat-box .label {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.stat-box .value {
+    color: var(--neon-green);
+    text-shadow: 0 0 8px var(--neon-green);
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-blue);
+}
+
+/* ==========================================
+   BUTTONS & UI CONTROLS
+   ========================================== */
+.btn {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    padding: 12px 24px;
+    border: 1px solid var(--neon-blue);
+    background: rgba(0, 243, 255, 0.1);
+    color: var(--neon-blue);
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.btn:hover {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 20px var(--neon-blue);
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+    background: rgba(0, 255, 102, 0.1);
+}
+
+.btn-primary:hover {
+    background: var(--neon-green);
+    color: #000;
+    box-shadow: 0 0 20px var(--neon-green);
+}
+
+.btn-action {
+    border-color: var(--neon-yellow);
+    color: var(--neon-yellow);
+    background: rgba(255, 204, 0, 0.15);
+}
+
+.btn-action:hover {
+    background: var(--neon-yellow);
+    color: #000;
+    box-shadow: 0 0 20px var(--neon-yellow);
+}
+
+/* ==========================================
+   SCREEN ROUTER & SCREENS
+   ========================================== */
+#main-view {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Loading Screen */
+#screen-loading {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.glow-title {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: #fff;
+    text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue);
+}
+
+.subtitle {
+    letter-spacing: 6px;
+    color: var(--neon-yellow);
+    margin-bottom: 30px;
+}
+
+.progress-bar-container {
+    width: 320px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue);
+    transition: width 0.1s linear;
+}
+
+.status-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Menu Screen */
+#screen-menu {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.tagline {
+    letter-spacing: 5px;
+    color: var(--neon-blue);
+    margin-bottom: 40px;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 280px;
+}
+
+/* Gameplay Screen Layout */
+#screen-game {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.room-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.room-title-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.badge {
+    background: var(--neon-blue);
+    color: #000;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.level-progress-fill {
+    height: 100%;
+    width: 20%;
+    background: var(--neon-green);
+    box-shadow: 0 0 8px var(--neon-green);
+    transition: width 0.4s ease;
+}
+
+.room-canvas {
+    flex: 1;
+    margin: 15px 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.room-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ==========================================
+   ROOM SPECIFIC GRAPHICS & PUZZLES
+   ========================================== */
+
+/* ROOM 1: Forces */
+.room1-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.car {
+    width: 120px;
+    height: 60px;
+    background: var(--neon-blue);
+    border-radius: 8px;
+    position: absolute;
+    bottom: 80px;
+    left: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-blue);
+    transition: left 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.car::before, .car::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    width: 24px;
+    height: 24px;
+    background: #222;
+    border: 2px solid var(--neon-blue);
+    border-radius: 50%;
+}
+.car::before { left: 15px; }
+.car::after { right: 15px; }
+
+.track-line {
+    position: absolute;
+    bottom: 70px;
+    width: 90%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.force-arrows {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    position: absolute;
+    top: 30px;
+}
+
+.arrow-btn {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.arrow-btn.selected {
+    border-color: var(--neon-green);
+    background: rgba(0, 255, 102, 0.2);
+}
+
+/* ROOM 2: Motion Input */
+.room2-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.info-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px 30px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--glass-border);
+}
+
+.sci-input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--neon-blue);
+    color: var(--neon-blue);
+    padding: 10px 15px;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    border-radius: 6px;
+    width: 150px;
+    text-align: center;
+    outline: none;
+}
+
+/* ROOM 3: Circuit Builder */
+.room3-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    gap: 20px;
+}
+
+.components-palette {
+    width: 180px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.draggable-item {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px dashed var(--neon-blue);
+    border-radius: 6px;
+    text-align: center;
+    cursor: grab;
+}
+
+.circuit-board {
+    flex: 1;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bulb-indicator {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #333;
+    border: 2px solid #555;
+    transition: all 0.5s ease;
+}
+
+.bulb-indicator.lit {
+    background: var(--neon-yellow);
+    box-shadow: 0 0 30px var(--neon-yellow);
+    border-color: #fff;
+}
+
+/* ROOM 4: Laser Reflection */
+.room4-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.mirror {
+    width: 80px;
+    height: 10px;
+    background: linear-gradient(90deg, #fff, var(--neon-blue));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--neon-blue);
+    border-radius: 5px;
+}
+
+.sensor {
+    width: 30px;
+    height: 30px;
+    background: #333;
+    border: 2px solid var(--neon-pink);
+    border-radius: 50%;
+    position: absolute;
+    top: 40px;
+    right: 40px;
+}
+
+.sensor.active {
+    background: var(--neon-green);
+    box-shadow: 0 0 20px var(--neon-green);
+    border-color: #fff;
+}
+
+/* ROOM 5: Energy Sequence */
+.room5-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.energy-slots {
+    display: flex;
+    gap: 15px;
+}
+
+.slot {
+    width: 100px;
+    height: 50px;
+    border: 2px dashed var(--glass-border);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.energy-pool {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.energy-chip {
+    padding: 8px 16px;
+    background: rgba(0, 243, 255, 0.15);
+    border: 1px solid var(--neon-blue);
+    border-radius: 20px;
+    cursor: grab;
+}
+
+/* ==========================================
+   AI ASSISTANT (PIXY)
+   ========================================== */
+.pixy-wrapper {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.pixy-bubble {
+    max-width: 260px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    border-color: var(--neon-blue);
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+}
+
+.pixy-avatar {
+    width: 50px;
+    height: 50px;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.pixy-eye {
+    width: 8px;
+    height: 8px;
+    background: #000;
+    border-radius: 50%;
+    position: absolute;
+    top: 18px;
+}
+.pixy-eye.left { left: 12px; }
+.pixy-eye.right { right: 12px; }
+
+.pixy-antenna {
+    width: 4px;
+    height: 10px;
+    background: var(--neon-blue);
+    position: absolute;
+    top: -8px;
+    left: 23px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* ==========================================
+   MODAL & ENDING
+   ========================================== */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-body ul {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+/* Ending Layout */
+#screen-ending {
+    justify-content: center;
+    align-items: center;
+}
+
+.ending-card {
+    padding: 40px;
+    text-align: center;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+#ending-icon {
+    font-size: 4rem;
+}
+
+.certificate {
+    padding: 20px;
+    width: 100%;
+    border-color: var(--neon-yellow);
+}
+
+.cert-name {
+    font-family: var(--font-heading);
+    color: var(--neon-yellow);
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.cert-stats {
+    display: flex;
+    justify-content: space-around;
+    font-size: 0.9rem;
+}
+
+.ending-actions {
+    display: flex;
+    gap: 15px;
+}
+
+/* Responsive Scaling */
+@media (max-width: 768px) {
+    #app { height: 98vh; }
+    .glow-title { font-size: 2rem; }
+    .stats-container { gap: 10px; font-size: 0.75rem; }
+    .pixy-bubble { max-width: 180px; font-size: 0.8rem; }
+}
